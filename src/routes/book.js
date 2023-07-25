@@ -5,11 +5,11 @@ router.get('/most-read', (req, res) => {
     res.send("most-read");
 });
 
-router.get('/add-book', (req, res) => {
+router.post('/add-book', (req, res) => {
     res.send("add-book");
 });
 
-router.get('/add-review', (req, res) => {
+router.post('/add-review', (req, res) => {
     res.send("add-review");
 });
 

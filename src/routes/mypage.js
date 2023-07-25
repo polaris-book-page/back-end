@@ -5,7 +5,7 @@ router.get('/', (req, res) => {
     res.send("mypage");
 });
 
-router.get('/modify', (req, res) => {
+router.put('/modify', (req, res) => {
     res.send("modify");
 });
 
@@ -17,27 +17,27 @@ router.get('/calendar', (req, res) => {
     res.send("calendar");
 });
 
-router.get('/star-review', (req, res) => {
+router.post('/star-review', (req, res) => {
     res.send("star-review");
 });
 
-router.get('/star-review/detail', (req, res) => {
+router.post('/star-review/detail', (req, res) => {
     res.send("star-review/detail");
 });
 
-router.get('/review/modify', (req, res) => {
+router.put('/review/modify', (req, res) => {
     res.send("review/modify");
 });
 
-router.get('/review/delete', (req, res) => {
+router.delete('/review/delete', (req, res) => {
     res.send("review/delete");
 });
 
-router.get('/like', (req, res) => {
+router.post('/like', (req, res) => {
     res.send("like");
 });
 
-router.get('/unlike', (req, res) => {
+router.delete('/unlike', (req, res) => {
     res.send("unlike");
 });
 

@@ -5,11 +5,11 @@ router.post('/join', (req, res) => {
     res.send("join");
 });
 
-router.post('/join/id-check', (req, res) => {
+router.get('/join/id-check', (req, res) => {
     res.send("/join/id-check");
 });
 
-router.post('/join/nickname-check', (req, res) => {
+router.get('/join/nickname-check', (req, res) => {
     res.send("/join/nickname-check");
 });
 

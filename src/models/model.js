@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const bcrypt = require('bcrypt')
 
 const userSchema  = mongoose.Schema({
 	_id: {
@@ -96,6 +97,15 @@ const quoteSchema = new mongoose.Schema({
 	page: Number,
 	category: String
 });
+
+userSchema.methods.comparePassword = function(plainPassword) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(plainPassword, this.password, function(err, isMatch) {
+      if (err) return reject(err);
+      resolve(isMatch);
+    });
+  });
+};
  
 const User = mongoose.model('User', userSchema) 
 const Like = mongoose.model('Like', likeSchema) 

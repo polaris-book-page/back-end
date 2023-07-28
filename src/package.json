@@ -23,6 +23,7 @@
   "homepage": "https://github.com/polaris-book-page/backend#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
+    "aws-sdk": "^2.1424.0",
     "body-parser": "^1.20.2",
     "connect-mongo": "^5.0.0",
     "cookie-parser": "^1.4.6",

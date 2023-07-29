@@ -26,7 +26,6 @@ app.use(session({
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
-        secure: true,
         maxAge:(3.6e+6)*24 // 24시간 유효
     },
     store: new fileStore()
@@ -40,7 +39,7 @@ mongoose.connect(config.mongoURI, {
 	useNewUrlParser: true, useUnifiedTopology: true
 }).then(() => console.log('MongoDB Connected ...'))
 	.catch(err => console.log(err))
- 
+
 app.use(bodyParser.urlencoded({extended: true})); 
 app.use(bodyParser.json()); 
 

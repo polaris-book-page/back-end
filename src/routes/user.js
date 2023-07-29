@@ -69,9 +69,6 @@ router.post('/initial-evaluation', (req, res) => {
 
 router.post('/login', async (req, res) => {
     const { _id, password } = req.body;
-    // if (!req.session) {
-    //     req.session = {};
-    // }
     try {
         const user = await User.findOne({ _id });
         if (!user) {
@@ -82,14 +79,8 @@ router.post('/login', async (req, res) => {
         if (!isMatch) {
             return res.json({ loginSuccess: false });
         }
-        console.log(req.session);
-        
-        console.log("id: ", _id)
         req.session.userId = _id
-        console.log("session id: ", req.session.id)
         req.session.is_logined = true
-        console.log("session is_logined: ", req.session.is_logined)
-        console.log(req.session);
         return res.json({ loginSuccess: true, session: req.session });
     } catch (err) {
         console.error(err);
@@ -98,9 +89,6 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/check', (req, res, next) => {
-    console.log("session is_logined: ", req.session.is_logined)
-    
-    console.log("session id: ", req.session.id)
     if(req.session.is_logined){
         return res.json({message: 'user 있다', session: req.session.is_logined });
     }else{
@@ -112,8 +100,8 @@ router.get("/logout", function(req, res, next){
     req.session.destroy();
     res.clearCookie('sid')
     res.send('logout')
-  })
-  
+})
+
 router.post('/subscribe', (req, res) => {
     res.send("join");
 });

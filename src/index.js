@@ -15,23 +15,21 @@ const userRouter = require('./routes/user')
 const cookieParser = require('cookie-parser')
 const session_key = require('../config/session_key');
 const session = require('express-session')
-const fileStore = require('session-file-store')(session);
+const MongoStore = require("connect-mongo");
 
 app.use(session({
     httpOnly: true,
     secure: true,
-    // secret: session_key.secret_key,
-    secret: "@haAdvanced",
+    secret: session_key.secret_key,
     resave: false,
     saveUninitialized: true,
     cookie: {
         httpOnly: true,
         maxAge:(3.6e+6)*24 // 24시간 유효
     },
-    store: new fileStore()
-    // store: MongoStore.create({
-    //     mongoUrl: config.mongoURI
-    // })
+    store: MongoStore.create({
+        mongoUrl: config.mongoURI
+    })
 }))
 app.use(cookieParser())
 

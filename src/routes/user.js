@@ -1,13 +1,7 @@
 const express = require('express') 
 const app = express()
 const router = express.Router()
-const cookieParser = require('cookie-parser')
-const session = require('express-session')
 const { User } = require('../models/model') 
-const mongoose = require('mongoose')
-const config = require('../../config/key');
-const session_key = require('../../config/session_key');
-const MongoStore = require("connect-mongo");
 const bcrypt = require('bcrypt')
 const saltRounds = 10
 
@@ -105,9 +99,5 @@ router.get("/logout", function(req, res, next){
 router.post('/subscribe', (req, res) => {
     res.send("join");
 });
-
-
-
-
 
 module.exports = router

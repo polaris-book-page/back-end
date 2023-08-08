@@ -4,6 +4,9 @@ const router = express.Router()
 const { User } = require('../models/model') 
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const email = require('../../config/email')
+const nodemailer = require('nodemailer');
+const crypto = require('crypto')
 
 router.post('/join', async (req, res) => {
     const userInfo = new User(req.body);
@@ -25,10 +28,10 @@ router.post('/join', async (req, res) => {
 });
 
 router.get('/join/id-check', async(req, res) => {
-    const { userId } = req.body;
+    const { _id } = req.body;
 
     try {
-        const result = await User.findOne({ userId });
+        const result = await User.findOne({ _id });
 
         if (result) {
             return res.json({ isAvailable: false });
@@ -82,18 +85,75 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.get('/check', (req, res, next) => {
-    if(req.session.is_logined){
-        return res.json({message: 'user 있다', session: req.session.is_logined });
-    }else{
-        return res.json({message: 'user 없음', session: req.session.is_logined});
-    }
-});
-
 router.get("/logout", function(req, res, next){
     req.session.destroy();
     res.clearCookie('sid')
     res.send('logout')
+})
+
+router.post("/forgot-password", async (req, res) => {
+    const { _id } = req.body;
+    const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+            user: email.auth.user,
+            pass: email.auth.pass
+        },
+        tls: {
+            rejectUnauthorized: false
+        }
+    });
+    try {
+        const user = await User.findOne({ _id });
+        if (!user) {
+            return res.json({ existingUser: false });
+        }
+        const token = crypto.randomBytes(20).toString("base64");
+        user.auth.token = token
+        user.auth.ttl = 300
+        user.auth.created = Date.now()
+        const result = await user.save();
+        const message = {
+            from: "bookpolaris2023@gmail.com",
+            to: user.email,
+            subject: "비밀번호 초기화 이메일입니다",
+            html: "<p>비밀번호 초기화를 위해서는 아래의 URL을 클릭해 주세요.</p>" 
+                + `<a href="http://localhost:3000/users/reset/${token}">비밀번호 재설정 링크</a>`
+        };
+        transporter.sendMail(message, (err, info) => {
+            if (err) {
+                console.error("err", err);
+                return res.status(500).json({ error: 'send email error' });
+            }
+        })
+        transporter.close();
+        res.status(200).json({ email_success: true, user: result });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'An error occurred during check-id.' });
+    }
+})
+
+router.post('/reset-password', async (req, res) => {
+    const new_password = req.body.password;
+    const { token } = req.body;
+        try {
+        const user = await User.findOne({ 
+            'auth.token': `${ token }`, 
+            'auth.created': { $lt: Date.now() - 300 } 
+        });
+        console.log('user: ', user)
+        if (!user) {
+            return res.json({ existingToken: false });
+        }
+        const result = await User.updateOne(
+            { $set: { password: await bcrypt.hash(new_password, saltRounds) } }
+        )
+        res.status(200).json({ reset_password_success: true, user: result });
+    } catch (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'An error occurred during check-id.' });
+    }
 })
 
 router.post('/subscribe', (req, res) => {

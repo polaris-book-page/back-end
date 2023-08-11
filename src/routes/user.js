@@ -118,7 +118,7 @@ router.post("/forgot-password", async (req, res) => {
             to: user.email,
             subject: "비밀번호 초기화 이메일입니다",
             html: "<p>비밀번호 초기화를 위해서는 아래의 URL을 클릭해 주세요.</p>" 
-                + `<a href="http://localhost:3001/auth/reset-password/?token=${token}">비밀번호 재설정 링크</a>`
+                + `<a href="http://localhost:3000/auth/reset-password/?token=${token}">비밀번호 재설정 링크</a>`
         };
         transporter.sendMail(message, (err, info) => {
             if (err) {

@@ -26,6 +26,11 @@ const userSchema  = mongoose.Schema({
 		type: String,
 		trim: true,
 		unique: 1
+	},
+	auth: {
+		token: String,
+		ttl: Number,
+		created: Number
 	}
 });
 

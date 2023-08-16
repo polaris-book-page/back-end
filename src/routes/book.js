@@ -37,11 +37,10 @@ router.post("/add-book", upload.single("bookImage"), async (req, res) => {
 
 router.post("/add-review", async (req, res) => {
     try {
-        const review = Review.findOne({
+        const review = await Review.findOne({
             userId: req.body.userId,
             isbn: req.body.isbn,
         });
-
         if (review == null) {
             // new review
             const reviewInfo = new Review(req.body);
@@ -57,7 +56,7 @@ router.post("/add-review", async (req, res) => {
                 {
                     $set: {
                         evaluation: req.body.evaluation,
-                        content: req.body.evaluation,
+                        content: req.body.content,
                         startDate: req.body.startDate,
                         endDate: req.body.endDate,
                         planetImage: req.body.planetImage,
@@ -65,7 +64,7 @@ router.post("/add-review", async (req, res) => {
                         progressPage: req.body.progressPage,
                         progressPercent: req.body.progressPercent,
                     },
-                }
+                }, {returnDocument: "after"}
             );
             res.status(200).json({
                 success: true,

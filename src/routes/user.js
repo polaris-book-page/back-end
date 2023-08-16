@@ -151,13 +151,18 @@ router.post('/reset-password', async (req, res) => {
     try {
         const user = await User.findOne({ 
             'auth.token': `${ token }`, 
-            'auth.created': { $lt: Date.now() - 300 } 
+            'auth.created': { $gt: Date.now() - 10 * 1000 } 
         });
         if (!user) {
             return res.json({ existingToken: false });
         }
         const result = await User.updateOne(
-            { $set: { password: await bcrypt.hash(new_password, saltRounds) } }
+            { _id: `${ user._id }` },
+            { $set: { 
+                password: await bcrypt.hash(new_password, saltRounds),
+                'auth.token': null,
+                'auth.ttl': null
+            } }
         )
         res.status(200).json({ 
             reset_password_success: true, 

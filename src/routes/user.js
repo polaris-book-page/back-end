@@ -36,11 +36,11 @@ router.get('/join/id-check', async(req, res) => {
         if (result) {
             return res.json({ isAvailable: false });
         } else {
-            return res.json({ isAvailable: true });
+            return res.status(200).json({ isAvailable: true });
         }
     } catch (err) {
         console.error('Error in /id-check', err);
-        res.status(500).json({ error: 'Server error', err });
+        res.status(500).json({ idCheckerror: 'An error occurred while checking the id.', err });
     }
 });
 
@@ -52,11 +52,11 @@ router.get('/join/nickname-check', async(req, res) => {
         if (result) {
             return res.json({ isAvailable: false });
         } else {
-            return res.json({ isAvailable: true });
+            return res.status(200).json({ isAvailable: true });
         }
     } catch (err) {
         console.error('Error in /nickname-check', err);
-        res.status(500).json({ error: 'Server error', err });
+        res.status(500).json({ nicknameCheckError: 'An error occurred while checking the nickname.', err });
     }
 });
 
@@ -78,17 +78,25 @@ router.post('/login', async (req, res) => {
         }
         req.session.userId = _id
         req.session.is_logined = true
-        return res.json({ loginSuccess: true, session: req.session });
+        return res.status(200).json({ 
+            loginSuccess: true, 
+            session: req.session 
+        });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'An error occurred during login.' });
+        console.error('Error in /login', err);
+        return res.status(500).json({ logoutError: 'An error occurred during login.', err });
     }
 });
 
 router.get("/logout", function(req, res, next){
-    req.session.destroy();
-    res.clearCookie('sid')
-    res.send('logout')
+    try {
+        req.session.destroy();
+        res.clearCookie('sid');
+        return res.status(200).json({ logoutSuccess: true });
+    } catch (err) {
+        console.error('Error in /logout', err);
+        return res.status(500).json({ error: 'An error occurred during logout.', err });
+    }
 })
 
 router.post("/forgot-password", async (req, res) => {
@@ -122,36 +130,47 @@ router.post("/forgot-password", async (req, res) => {
         };
         transporter.sendMail(message, (err, info) => {
             if (err) {
-                console.error("err", err);
-                return res.status(500).json({ error: 'send email error' });
+                console.error('Error in send email', err);
+                return res.status(500).json({ email_success: false, err });
             }
         })
         transporter.close();
-        res.status(200).json({ email_success: true, user: result });
+        res.status(200).json({ 
+            email_success: true, 
+            user: result 
+        });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'An error occurred during check-id.' });
+        console.error('Error in /forgot-password', err);
+        return res.status(500).json({ error: 'An error occurred during forgot-password', err });
     }
 })
 
 router.post('/reset-password', async (req, res) => {
     const new_password = req.body.password;
     const { token } = req.body;
-        try {
+    try {
         const user = await User.findOne({ 
             'auth.token': `${ token }`, 
-            'auth.created': { $lt: Date.now() - 300 } 
+            'auth.created': { $gt: Date.now() - 10 * 1000 } 
         });
         if (!user) {
             return res.json({ existingToken: false });
         }
         const result = await User.updateOne(
-            { $set: { password: await bcrypt.hash(new_password, saltRounds) } }
+            { _id: `${ user._id }` },
+            { $set: { 
+                password: await bcrypt.hash(new_password, saltRounds),
+                'auth.token': null,
+                'auth.ttl': null
+            } }
         )
-        res.status(200).json({ reset_password_success: true, user: result });
+        res.status(200).json({ 
+            reset_password_success: true, 
+            user: result 
+        });
     } catch (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'An error occurred during check-id.' });
+        console.error('Error in /reset-password', err);
+        return res.status(500).json({ error: 'An error occurred during reset-password.', err });
     }
 })
 

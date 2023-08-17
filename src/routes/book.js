@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../aws-storage.js");
-const { Book, Review } = require("../models/model");
+const { Book, Review, User, Quote } = require("../models/model");
 
 router.get("/most-read", (req, res) => {
     res.send("most-read");
@@ -81,8 +81,65 @@ router.get("/info", (req, res) => {
     res.send("info");
 });
 
-router.get("/info/rewiew", (req, res) => {
-    res.send("info/rewiew");
+router.get("/info/rewiew", async (req, res) => {
+    if(!req.session.is_logined){
+        res.redirect('/user/login');
+    }
+    try {
+        const review = await Review.findOne({ userId: req.session.userId, isbn: req.body.isbn })
+        const quoteReview = await Quote.find({ userId: req.session.userId, isbn: req.body.isbn })
+        const quoteInfo = Object.keys(quoteReview).length === 0 ? null : {
+            sentence: quoteReview[0].sentence,
+            page: quoteReview[0].page
+        };
+        console.log(review)
+        const result = {
+                isbn: review.isbn,
+                evaluation: review.evaluation,
+                planetImage: review.planetImage ? review.planetImage : null,
+                startDate: review.startDate,
+                endDate: review.endDate,
+                content: review.content ? review.content : null,
+                bookImage: req.body.bookImage,
+                quote: quoteInfo
+        } 
+        res.status(200).json(result)
+    } catch (err) {
+        console.error('Error in read my review detail', err);
+        res.status(500).json({ findMyOneReview: false, err });
+    }
+});
+
+router.get("/info/rewiew/list", async (req, res) => {
+    try {
+        const reviews = await Review.find({ isbn: req.body.isbn })
+        if (reviews.length === 0) {
+            res.status(404).json({ 
+                findBookReview: false, 
+                message: 'No review corresponding to this isbn' });
+        }
+        const userIds = reviews.map(review => review.userId)
+        const users = await User.find({ _id: userIds })
+        const result = reviews.map(review => {
+            const user = users.find(user => user._id.toString() === review.userId.toString());
+            
+            console.log("user: ", user)
+            return {
+                userId: review.userId,
+                isbn: review.isbn,
+                content: review.content ? review.content : null,
+                startDate: review.startDate,
+                createDate: review.createDate,
+                evaluation: review.evaluation,
+                profileImage: user.profileImage ? user.profileImage : null
+                //완독 권수를 어떻게 가져오지 다 읽었다고 별점을 남기면 그걸 db에 저장?
+            };
+        })
+        res.status(200).json(result)
+    } catch (err) {
+        console.error('Error in read book review list', err);
+        res.status(500).json({ findBookReview: false, err });
+    }
 });
 
 module.exports = router;

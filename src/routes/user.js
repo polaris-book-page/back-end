@@ -10,6 +10,9 @@ const session_key = require('../../config/session_key');
 const MongoStore = require("connect-mongo");
 const bcrypt = require('bcrypt')
 const saltRounds = 10
+const email = require('../../config/email')
+const nodemailer = require('nodemailer');
+const crypto = require('crypto')
 
 router.post('/join', async (req, res) => {
     const userInfo = new User(req.body);
@@ -154,7 +157,7 @@ router.post('/reset-password', async (req, res) => {
     try {
         const user = await User.findOne({ 
             'auth.token': `${ token }`, 
-            'auth.created': { $gt: Date.now() - 10 * 1000 } 
+            'auth.created': { $gt: Date.now() - 300 * 1000 } 
         });
         if (!user) {
             return res.json({ existingToken: false });

@@ -117,13 +117,22 @@ router.get("/info/rewiew/list", async (req, res) => {
             res.status(404).json({ 
                 findBookReview: false, 
                 message: 'No review corresponding to this isbn' });
-        }
-        const userIds = reviews.map(review => review.userId)
-        const users = await User.find({ _id: userIds })
-        const result = reviews.map(review => {
-            const user = users.find(user => user._id.toString() === review.userId.toString());
-            
-            console.log("user: ", user)
+            }
+            const userIds = reviews.map(review => review.userId)
+            const users = await User.find({ _id: userIds })
+
+            const userIdToReviewCountMap = await Review.aggregate([
+                { $match: { userId: { $in: userIds } } },
+                { $group: { _id: "$userId", count: { $sum: 1 } } }
+            ]);
+            const userIdToReviewCount = {};
+            userIdToReviewCountMap.forEach(item => {
+                userIdToReviewCount[item._id.toString()] = item.count;
+            });
+        
+            const result = reviews.map(review => {
+                const user = users.find(user => user._id.toString() === review.userId.toString());
+                const login_user_reviews = userIdToReviewCount[review.userId.toString()] || 0;
             return {
                 userId: review.userId,
                 isbn: review.isbn,
@@ -131,8 +140,8 @@ router.get("/info/rewiew/list", async (req, res) => {
                 startDate: review.startDate,
                 createDate: review.createDate,
                 evaluation: review.evaluation,
-                profileImage: user.profileImage ? user.profileImage : null
-                //완독 권수를 어떻게 가져오지 다 읽었다고 별점을 남기면 그걸 db에 저장?
+                profileImage: user.profileImage ? user.profileImage : null,
+                finRead: login_user_reviews
             };
         })
         res.status(200).json(result)

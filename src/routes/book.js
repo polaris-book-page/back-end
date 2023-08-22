@@ -49,10 +49,6 @@ router.put("/add-review", async (req, res) => {
             // new review
             const reviewInfo = new Review(req.body);
             const result = await reviewInfo.save();
-            // res.status(200).json({
-            //     success: true,
-            //     data: result,
-            // });
             reviewId = reviewInfo._id;
             resBody = result;
         } else {
@@ -72,10 +68,6 @@ router.put("/add-review", async (req, res) => {
                     },
                 }, {returnDocument: "after"}
             );
-            // res.status(200).json({
-            //     success: true,
-            //     data: result,
-            // });
             reviewId = result._id;
             resBody = result;
         }

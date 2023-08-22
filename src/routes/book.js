@@ -35,7 +35,11 @@ router.post("/add-book", upload.single("bookImage"), async (req, res) => {
     }
 });
 
-router.post("/add-review", async (req, res) => {
+router.put("/add-review", async (req, res) => {
+    let reviewId;
+    let resBody;
+    let quotes = new Array();;
+
     try {
         const review = await Review.findOne({
             userId: req.body.userId,
@@ -45,10 +49,12 @@ router.post("/add-review", async (req, res) => {
             // new review
             const reviewInfo = new Review(req.body);
             const result = await reviewInfo.save();
-            res.status(200).json({
-                success: true,
-                data: result,
-            });
+            // res.status(200).json({
+            //     success: true,
+            //     data: result,
+            // });
+            reviewId = reviewInfo._id;
+            resBody = result;
         } else {
             // exist review content
             const result = await Review.findOneAndUpdate(
@@ -66,11 +72,35 @@ router.post("/add-review", async (req, res) => {
                     },
                 }, {returnDocument: "after"}
             );
-            res.status(200).json({
-                success: true,
-                data: result,
-            });
+            // res.status(200).json({
+            //     success: true,
+            //     data: result,
+            // });
+            reviewId = result._id;
+            resBody = result;
         }
+
+        // new Quotes
+        if (req.body.quotes != null) {
+            for (i in req.body.quotes) {
+                const quoteInfo = new Quote({
+                    reviewId: reviewId, 
+                    isbn: req.body.isbn,
+                    quote:req.body.quotes[i]['quote'],
+                    page:req.body.quotes[i]['page'],
+                    category: req.body.category,
+                });
+                const result = await quoteInfo.save();
+                quotes.push(result);
+            }
+        }
+        
+        // return
+        res.status(200).json({
+            success: true,
+            data: {result: resBody, quotes: quotes.length != 0 ? quotes : null}
+        });
+
     } catch (err) {
         console.log(err);
         res.status(500).json({ error: "fail to add review.", err });

@@ -38,7 +38,7 @@ router.post("/add-book", upload.single("bookImage"), async (req, res) => {
 router.put("/add-review", async (req, res) => {
     let reviewId;
     let resBody;
-    let quotes = new Array();;
+    let quotes = new Array();
 
     try {
         const review = await Review.findOne({

@@ -122,8 +122,15 @@ router.put('/review/modify', async (req, res) => {
     }
 });
 
-router.delete('/review/delete', (req, res) => {
-    res.send("review/delete");
+router.delete('/review/delete', async (req, res) => {
+    //console.log(req.query)
+    try {
+        const reviewResult = await Review.deleteOne({ _id: req.query.reviewId })
+        res.status(200).json({success: true, reviewResult})
+    } catch (err) {
+        res.status(500).json({success: false, err})
+    }
+    
 });
 
 router.post('/like', async (req, res) => {

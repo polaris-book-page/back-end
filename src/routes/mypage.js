@@ -64,15 +64,49 @@ router.put('/review/modify', async (req, res) => {
 
         // update quote
         const findQuote = await Quote.find({ reviewId: req.body._id })
-        for (i in findQuote) {
-            const quoteResult = await Quote.findOneAndUpdate({ _id: findQuote[i]._id }, {
-                $set: {
-                    quote: req.body.quotes[i].quote,
-                    page: req.body.quotes[i].page,
-                }
-            }, { returnDocument: "after" })
-            quotes.push(quoteResult)
+
+        if (findQuote.length <= req.body.quotes.length) { // update + create
+            // update
+            for (find in findQuote) {
+                const quoteResult = await Quote.findOneAndUpdate({ _id: findQuote[find]._id }, {
+                    $set: {
+                        quote: req.body.quotes[find].quote,
+                        page: req.body.quotes[find].page,
+                    }
+                }, { returnDocument: "after" })
+                quotes.push(quoteResult);
+                //console.log(quoteResult)
+            }
+            //create
+            for (let add = 0; add < req.body.quotes.length - findQuote.length; add++) {
+                const quoteInfo = new Quote({
+                    reviewId: reviewResult._id,
+                    isbn: reviewResult.isbn,
+                    quote: req.body.quotes[findQuote.length + add]['quote'],
+                    page: req.body.quotes[findQuote.length + add]['page'],
+                    category: req.body.category,
+                });
+                const result = await quoteInfo.save();
+                quotes.push(result);
+            } 
+        } else { // update + delete
+            // delete
+            const quoteResult = await Quote.deleteMany({ reviewId: reviewResult._id })
+
+            //create
+            for (add in req.body.quotes) {
+                const quoteInfo = new Quote({
+                    reviewId: reviewResult._id,
+                    isbn: reviewResult.isbn,
+                    quote: req.body.quotes[add]['quote'],
+                    page: req.body.quotes[add]['page'],
+                    category: req.body.category,
+                });
+                const result = await quoteInfo.save();
+                quotes.push(result);
+            }
         }
+        
         //console.log(quotes)
         const result = {
             updateReview: reviewResult,

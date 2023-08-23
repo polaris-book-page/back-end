@@ -1,6 +1,6 @@
 const express = require('express') 
 const router = express.Router()
-const { Review, Like, Book } = require('../models/model')
+const { Review, Like, Book, Quote } = require('../models/model');
 
 router.get('/', (req, res) => {
     res.send("mypage");
@@ -47,8 +47,45 @@ router.post('/star-review/detail', (req, res) => {
     res.send("star-review/detail");
 });
 
-router.put('/review/modify', (req, res) => {
-    res.send("review/modify");
+router.put('/review/modify', async (req, res) => {
+    let quotes = new Array();
+
+    try {
+        // update review
+        // add to planetImage property later.
+        const reviewResult = await Review.findOneAndUpdate({ _id: req.body._id }, {
+            $set: {
+            evaluation: req.body.evaluation,
+            content: req.body.content,
+            startDate: req.body.startDate,
+            endDate: req.body.endDate,
+            }
+        }, { returnDocument: "after" })
+
+        // update quote
+        const findQuote = await Quote.find({ reviewId: req.body._id })
+        for (i in findQuote) {
+            const quoteResult = await Quote.findOneAndUpdate({ _id: findQuote[i]._id }, {
+                $set: {
+                    quote: req.body.quotes[i].quote,
+                    page: req.body.quotes[i].page,
+                }
+            }, { returnDocument: "after" })
+            quotes.push(quoteResult)
+        }
+        //console.log(quotes)
+        const result = {
+            updateReview: reviewResult,
+            updateQuote: quotes.length != 0 ? quotes : null
+        }
+        res.status(200).json({
+            success: true,
+            result: result
+        })
+
+    } catch (err) {
+        res.status(500).json({success: false, err})
+    }
 });
 
 router.delete('/review/delete', (req, res) => {

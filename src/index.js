@@ -15,6 +15,7 @@ const userRouter = require('./routes/user')
 const cookieParser = require('cookie-parser')
 const bookRouter = require("./routes/book");
 const mypageRouter = require('./routes/mypage')
+const searchRouter = require('./routes/search')
 const session_key = require('../config/session_key');
 const session = require('express-session')
 const MongoStore = require('connect-mongo');
@@ -54,5 +55,6 @@ app.get("/", (req, res) => res.send("Hello World!"));
 app.use("/user", userRouter);
 app.use("/book", bookRouter);
 app.use("/mypage", mypageRouter);
+app.use("/search", searchRouter);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

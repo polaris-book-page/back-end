@@ -24,21 +24,6 @@ const storage = multerS3({
   },
 });
 
-// const params = {
-//   Bucket: "polaris-book",
-//   Key: "/image",
-//   Body: fs.readFileSync("img.jpg"),
-//   ContentType: "image/png",
-// };
-
-// upload
-// s3.upload(params, function (err, data) {
-//   if (err) {
-//     throw err;
-//   }
-//   console.log(`file uploaded successfully.' ${data}`);
-// });
-
 const upload = multer({ storage: storage });
 
 module.exports = upload;

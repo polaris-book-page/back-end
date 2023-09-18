@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { Book } = require('../models/model');
 
-router.post('/result', async (req, res) => {
+router.post('/result/save', async (req, res) => {
     const books = req.body;
     try {
         const bookList = books.map(async book => {

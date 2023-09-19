@@ -30,12 +30,18 @@ router.post('/star-review', async (req, res) => {
                 message: 'No review corresponding to this user' 
             });
         }
-        const reviewList = results.map(result => ({
-            userId: result.userId,
-            isbn: result.isbn,
-            evaluation: result.evaluation,
-            endDate: result.endDate
-        }));
+        const isbn = results.map(result => result.isbn);
+        const books = await Book.find({ isbn: isbn });
+        const reviewList = results.map(result => {
+            const book = books.find(book => book.isbn.toString() === result.isbn.toString());
+            return {
+                userId: result ? result.userId : null,
+                isbn: result ? result.isbn : null,
+                evaluation: result ? result.evaluation : null,
+                endDate: result ? result.endDate: null,
+                bookImage: book ? book.bookImage : null
+            }
+        })
         res.status(200).json(reviewList);
     } catch (err) {
         console.error('Error in read my review list', err);

@@ -68,6 +68,7 @@ router.put('/review/modify', async (req, res) => {
         if (findQuote.length <= req.body.quotes.length) { // update + create
             // update
             for (find in findQuote) {
+                console.log(find)
                 const quoteResult = await Quote.findOneAndUpdate({ _id: findQuote[find]._id }, {
                     $set: {
                         quote: req.body.quotes[find].quote,
@@ -75,8 +76,9 @@ router.put('/review/modify', async (req, res) => {
                     }
                 }, { returnDocument: "after" })
                 quotes.push(quoteResult);
-                //console.log(quoteResult)
-            }
+                
+
+            } 
             //create
             for (let add = 0; add < req.body.quotes.length - findQuote.length; add++) {
                 const quoteInfo = new Quote({
@@ -88,12 +90,12 @@ router.put('/review/modify', async (req, res) => {
                 });
                 const result = await quoteInfo.save();
                 quotes.push(result);
-            } 
+            }
         } else { // update + delete
             // delete
-            const quoteResult = await Quote.deleteMany({ reviewId: reviewResult._id })
-
-            //create
+            const quoteResult = await Quote.deleteMany({ reviewId: reviewResult._id }, {returnDocument: "after"})
+            quotes.push(quoteResult)
+            // //create
             for (add in req.body.quotes) {
                 const quoteInfo = new Quote({
                     reviewId: reviewResult._id,

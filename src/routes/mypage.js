@@ -18,7 +18,7 @@ router.get('/calendar', (req, res) => {
     res.send("calendar");
 });
 
-router.post('/star-review', async (req, res) => {
+router.get('/star-review', async (req, res) => {
     if(!req.session.is_logined){
         res.redirect('/user/login');
     }

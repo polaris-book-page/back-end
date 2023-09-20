@@ -4,6 +4,7 @@ const router = express.Router()
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
 const { User } = require('../models/model') 
+const { Subscribe } = require('../models/subscribe') 
 const mongoose = require('mongoose')
 const config = require('../../config/key');
 const session_key = require('../../config/session_key');
@@ -16,7 +17,6 @@ const crypto = require('crypto')
 
 router.post('/join', async (req, res) => {
     const userInfo = new User(req.body);
-    
     try {
         const hash = await bcrypt.hash(userInfo.password, saltRounds);
         userInfo.password = hash;
@@ -180,8 +180,26 @@ router.post('/reset-password', async (req, res) => {
     }
 })
 
-router.post('/subscribe', (req, res) => {
-    res.send("join");
+router.post('/subscribe', async (req, res) => {
+    const { email } = req.body;
+    const subscribeInfo = new Subscribe(req.body);
+    console.log(subscribeInfo)
+    try {
+        const isExist = await Subscribe.findOne({ email });
+        console.log(isExist)
+        if (isExist) {
+            return res.json({ alreadyExist: true });
+        } 
+        const subscribeInfo = new Subscribe(req.body);
+        console.log("subscribeInfo: ", subscribeInfo)
+        const result = await subscribeInfo.save();
+        res.status(200).json({
+            subscribe_success: true,
+            result: result 
+        });
+    } catch (err) {
+        res.status(500).json({ subscribe_success: false, err });
+    }
 });
 
 module.exports = router

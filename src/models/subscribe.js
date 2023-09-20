@@ -12,4 +12,7 @@ const subscribeSchema = new mongoose.Schema({
 	}
 });
 
-module.exports = mongoose.model('Subscribe', subscribeSchema);
+const Subscribe = mongoose.model('Subscribe', subscribeSchema);
+
+module.exports = { Subscribe }
+// module.exports = mongoose.model('Subscribe', subscribeSchema);

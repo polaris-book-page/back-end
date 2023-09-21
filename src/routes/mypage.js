@@ -1,13 +1,60 @@
 const express = require('express') 
 const router = express.Router()
-const { Review, Like, Book, Quote } = require('../models/model');
+const { Review, Like, Book, Quote, User } = require('../models/model');
+const email = require('../../config/email');
 
-router.get('/', (req, res) => {
-    res.send("mypage");
+router.get('/', async (req, res) => {
+    if(!req.session.is_logined){
+        res.redirect('/user/login');
+    }
+    try {
+        const result = await User.findOne({ _id: req.session.userId });
+
+        if (!result) {
+            return res.json({ userExist: false });
+        } 
+        res.status(200).json({
+            _id: result._id,
+            nickname:result.nickname,
+            profileImage: result.profileImage ? result.profileImage : null,
+            email: result.email,
+            createDate: result.createDate
+        });
+    } catch (err) {
+        res.status(500).json({ loadUserInfo: false, err })
+    }
 });
 
-router.put('/modify', (req, res) => {
-    res.send("modify");
+router.put('/modify', async (req, res) => {
+    if(!req.session.is_logined){
+        res.redirect('/user/login');
+    }
+    const { profileImage, nickname } = req.body;
+    const updateField= {};
+    if (profileImage) {
+        updateField.profileImage = profileImage;
+    }
+    if (nickname) {
+        updateField.nickname = nickname;
+    }
+    console.log(updateField)
+    try {
+
+        const result = await User.updateOne(
+            { _id: `${ req.session.userId }` },
+            { $set: 
+                updateField
+            }
+        )
+        if (!result) {
+            return res.json({ userExist: false });
+        } 
+        res.status(200).json({
+            update_result: result,
+        });
+    } catch (err) {
+        res.status(500).json({ modifyUserInfo: false, err })
+    }
 });
 
 router.get('/universe', (req, res) => {

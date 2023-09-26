@@ -19,6 +19,13 @@ const searchRouter = require('./routes/search')
 const session_key = require('../config/session_key');
 const session = require('express-session')
 const MongoStore = require('connect-mongo');
+const cors = require('cors')
+
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use(
     session({

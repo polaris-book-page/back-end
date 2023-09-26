@@ -224,6 +224,7 @@ router.delete('/unlike', async (req, res) => {
 });
 
 router.get('/like/list', async (req, res) => {
+    console.log("sessionId: ", req.session.userId)
     if(!req.session.is_logined){
         res.redirect('/user/login');
     }
@@ -238,9 +239,9 @@ router.get('/like/list', async (req, res) => {
                 isbn: like.isbn,
                 userId: like.userId,
                 title: book ? book.title : null,
-                writer: book ? book.writer : null,
+                author: book ? book.writer : null,
                 publisher: book ? book.publisher : null,
-                bookImage: book ? book.bookImage : null,
+                cover: book ? book.bookImage : null,
             };
         })
         res.status(200).json(result)

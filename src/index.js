@@ -52,9 +52,9 @@ app.use(bodyParser.json());
 app.get("/", (req, res) => res.send("Hello World!"));
 
 // join
-app.use("/user", userRouter);
-app.use("/book", bookRouter);
-app.use("/mypage", mypageRouter);
-app.use("/search", searchRouter);
+app.use("/api/user", userRouter);
+app.use("/api/book", bookRouter);
+app.use("/api/mypage", mypageRouter);
+app.use("/api/search", searchRouter);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

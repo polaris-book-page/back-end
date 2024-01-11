@@ -78,10 +78,6 @@ router.post('/initial-evaluation', (req, res) => {
 });
 
 router.post('/login', async (req, res) => {
-    // console.log('들어오니?')
-    // if(req.session.is_logined){
-    //     res.redirect('/');
-    // }
     console.log(req.session)
     const { _id, password } = req.body;
     try {
@@ -96,25 +92,30 @@ router.post('/login', async (req, res) => {
         }
         req.session.userId = _id
         req.session.is_logined = true
-        return res.status(200).json({ 
-            loginSuccess: true, 
-            session: req.session 
-        });
+        req.session.save(function () {
+            return res.status(200).json({ 
+                loginSuccess: true, 
+                session: req.session 
+            });
+        })
     } catch (err) {
         console.error('Error in /login', err);
         return res.status(500).json({ logoutError: 'An error occurred during login.', err });
     }
 });
 
+router.get("/check", async (req, res) => {
+    if(req.session.is_logined){
+        return res.status(201).json({ is_logined: req.session.is_logined});
+    } else {
+        return res.json({ is_logined: false });
+    }
+})
+
 router.get("/logout", function(req, res, next){
     try {
-        console.log("before", req.session)
         req.session.destroy();
         res.clearCookie('connect.sid');
-        console.log("after", req.session)
-        // req.session.save(function () {
-        // res.redirect('/');
-        // })
         return res.status(200).json({ logoutSuccess: true, userid: req.session });
     } catch (err) {
         console.error('Error in /logout', err);

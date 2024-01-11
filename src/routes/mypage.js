@@ -224,14 +224,12 @@ router.delete('/unlike', async (req, res) => {
 });
 
 router.get('/like/list', async (req, res) => {
-    console.log("sessionId: ", req.session.userId)
-    if(!req.session.is_logined){
-        res.redirect('/user/login');
-    }
     try {
         const likes = await Like.find({ userId: req.session.userId });
         const isbn = likes.map(like => like.isbn);
         const books = await Book.find({ isbn: isbn });
+
+        const user = await User.findOne({ _id: req.session.userId });
         const result = likes.map(like => {
             const book = books.find(book => book.isbn.toString() === like.isbn.toString());
             return {
@@ -242,12 +240,13 @@ router.get('/like/list', async (req, res) => {
                 author: book ? book.writer : null,
                 publisher: book ? book.publisher : null,
                 cover: book ? book.bookImage : null,
+                nickname: user ? user.nickname : null,
             };
         })
         res.status(200).json(result)
     } catch (err) {
         console.error('Error in read like list', err);
-        res.status(500).json({ findLike: false, err });
+        res.status(500).json({ findLfike: false, err });
     }
 })
 

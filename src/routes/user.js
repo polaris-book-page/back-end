@@ -3,7 +3,7 @@ const app = express()
 const router = express.Router()
 const cookieParser = require('cookie-parser')
 const session = require('express-session')
-const { User } = require('../models/model') 
+const { User, Book, Review } = require('../models/model') 
 const { Subscribe } = require('../models/subscribe') 
 const mongoose = require('mongoose')
 const config = require('../../config/key');
@@ -106,9 +106,9 @@ router.post('/login', async (req, res) => {
 
 router.get("/check", async (req, res) => {
     if(req.session.is_logined){
-        return res.status(201).json({ is_logined: req.session.is_logined});
+        return res.status(201).json({ is_logined: req.session.is_logined, userId: req.session.userId});
     } else {
-        return res.json({ is_logined: false });
+        return res.json({ is_logined: false, userId: "none" });
     }
 })
 

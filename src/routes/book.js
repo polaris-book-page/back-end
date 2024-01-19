@@ -173,4 +173,13 @@ router.get("/info/rewiew/list", async (req, res) => {
     }
 });
 
+router.get("/ten-quotes", async (req, res) => {
+    try {
+        const quotes = await Quote.aggregate([{ $sample: { size: 10 } }])
+        res.status(200).json({ success: true, quotes: quotes })
+    } catch (err) {
+        res.status(500).json({ findQuote: false, err });
+    }
+});
+
 module.exports = router;

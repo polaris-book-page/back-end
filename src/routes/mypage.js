@@ -72,7 +72,7 @@ router.get('/star-review', async (req, res) => {
     try {
         const results = await Review.find({ userId: req.session.userId })
         if (results.length === 0) {
-            res.status(404).json({ 
+            return res.status(200).json({ 
                 findMyReview: false, 
                 message: 'No review corresponding to this user' 
             });
@@ -89,7 +89,7 @@ router.get('/star-review', async (req, res) => {
                 bookImage: book ? book.bookImage : null
             }
         })
-        res.status(200).json(reviewList);
+        res.status(200).json({ reviewList: reviewList, findMyReview: true });
     } catch (err) {
         console.error('Error in read my review list', err);
         res.status(500).json({ findMyReview: false, err });

@@ -106,9 +106,9 @@ router.post('/login', async (req, res) => {
 
 router.get("/check", async (req, res) => {
     if(req.session.is_logined){
-        return res.status(201).json({ is_logined: req.session.is_logined});
+        return res.status(201).json({ is_logined: req.session.is_logined, userId: req.session.userId});
     } else {
-        return res.json({ is_logined: false });
+        return res.json({ is_logined: false, userId: "none" });
     }
 })
 
@@ -219,5 +219,20 @@ router.post('/subscribe', async (req, res) => {
         res.status(500).json({ subscribe_success: false, err });
     }
 });
+
+router.get('/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    
+    try {
+        const findUser = await User.findOne({_id: userId})
+        if (findUser == null) return res.status(200).json({success: false, findUser})
+        return res.status(200).json({success: true, findUser})
+    } catch (err) { // user is none
+        return res.status(404).json({
+            success: false,
+            message: "fail to find user."
+        })
+    }
+})
 
 module.exports = router

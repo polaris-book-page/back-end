@@ -254,4 +254,19 @@ router.post('/subscribe', async (req, res) => {
     }
 });
 
+router.get('/:userId', async (req, res) => {
+    const userId = req.params.userId;
+    
+    try {
+        const findUser = await User.findOne({_id: userId})
+        if (findUser == null) return res.status(200).json({success: false, findUser})
+        return res.status(200).json({success: true, findUser})
+    } catch (err) { // user is none
+        return res.status(404).json({
+            success: false,
+            message: "fail to find user."
+        })
+    }
+})
+
 module.exports = router

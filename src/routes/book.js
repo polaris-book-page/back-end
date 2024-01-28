@@ -3,8 +3,17 @@ const router = express.Router();
 const upload = require("../aws-storage.js");
 const { Book, Review, User, Quote } = require("../models/model");
 
-router.get("/most-read", (req, res) => {
-    res.send("most-read");
+router.get("/most-read", async (req, res) => {
+    try {
+        const loadReview = await Review.aggregate([
+            { $group: { _id: "$isbn", count: { $count: {} } } },
+            {$sort: {count: -1} }
+        ]);
+
+        return res.status(200).json(loadReview);
+    } catch (err) {
+        res.status(500).json({ error: "most read a book load failure.", err });
+    }
 });
 
 router.post("/add-book", upload.single("bookImage"), async (req, res) => {
@@ -170,6 +179,15 @@ router.get("/info/rewiew/list", async (req, res) => {
     } catch (err) {
         console.error('Error in read book review list', err);
         res.status(500).json({ findBookReview: false, err });
+    }
+});
+
+router.get("/ten-quotes", async (req, res) => {
+    try {
+        const quotes = await Quote.aggregate([{ $sample: { size: 10 } }])
+        res.status(200).json({ success: true, quotes: quotes })
+    } catch (err) {
+        res.status(500).json({ findQuote: false, err });
     }
 });
 

@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const { Review, Like, Book, Quote, User } = require('../models/model');
 const email = require('../../config/email');
+const upload = require("../aws-storage.js");
 
 router.get('/', async (req, res) => {
     if(!req.session.is_logined){
@@ -25,11 +26,13 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.put('/modify', async (req, res) => {
+router.put('/modify', upload.single("profileImage"), async (req, res) => {
     if(!req.session.is_logined){
         res.redirect('/user/login');
     }
-    const { profileImage, nickname } = req.body;
+    
+    const profileImage = req.file.location;
+    const nickname = req.body.nickname;
     const updateField= {};
     if (profileImage) {
         updateField.profileImage = profileImage;

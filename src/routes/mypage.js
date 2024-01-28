@@ -251,4 +251,24 @@ router.get('/like/list', async (req, res) => {
     }
 })
 
+router.post('/goal', async (req, res) => {
+    try {
+        const result = await User.findOneAndUpdate(
+            { userId: req.body._id },
+            {
+                $set: {
+                    goal: req.body.goal
+                },
+            }, {returnDocument: "after"}
+        );        
+        res.status(200).json({
+            goal_success: true,
+            result: result  
+        });
+    } catch (err) {
+        console.error('Error in save goal', err);
+        res.status(500).json({ goal_success: false, err });
+    }
+})
+
 module.exports = router

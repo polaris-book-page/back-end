@@ -44,7 +44,7 @@ router.post("/add-book", upload.single("bookImage"), async (req, res) => {
     }
 });
 
-router.put("/add-review", async (req, res) => {
+router.put("/add-review", upload.single("planetImage"), async (req, res) => {
     let reviewId;
     let resBody;
     let quotes = new Array();
@@ -56,7 +56,19 @@ router.put("/add-review", async (req, res) => {
         });
         if (review == null) {
             // new review
-            const reviewInfo = new Review(req.body);
+            const reviewInfo = new Review({
+                userId: req.body.userId,
+                isbn: req.body.isbn,
+                evaluation: req.body.evaluation,
+                content: req.body.content,
+                progressPage: req.body.progressPage,
+                progressPercent: req.body.progressPercent,
+                quotes: req.body.quotes,
+                category: req.body.category,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
+                planetImage: req.file.location
+            });
             const result = await reviewInfo.save();
             reviewId = reviewInfo._id;
             resBody = result;
@@ -70,7 +82,7 @@ router.put("/add-review", async (req, res) => {
                         content: req.body.content,
                         startDate: req.body.startDate,
                         endDate: req.body.endDate,
-                        planetImage: req.body.planetImage,
+                        planetImage: req.file.location,
                         type: req.body.type,
                         progressPage: req.body.progressPage,
                         progressPercent: req.body.progressPercent,

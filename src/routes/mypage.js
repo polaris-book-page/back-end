@@ -86,7 +86,8 @@ router.get('/star-review', async (req, res) => {
                 isbn: result ? result.isbn : null,
                 evaluation: result ? result.evaluation : null,
                 endDate: result ? result.endDate: null,
-                bookImage: book ? book.bookImage : null
+                bookImage: book ? book.bookImage : null,
+                planetImage: result ? result.planetImage : null,
             }
         })
         res.status(200).json({ reviewList: reviewList, findMyReview: true });

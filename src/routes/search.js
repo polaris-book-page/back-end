@@ -3,7 +3,8 @@ const router = express.Router()
 const { Book } = require('../models/model');
 
 router.post('/result/save', async (req, res) => {
-    const books = req.body;
+    const { books } = req.body;
+
     try {
         const bookList = books.map(async book => {
             const alreadyHave = await Book.findOne({ isbn: book.isbn13 })
@@ -22,7 +23,6 @@ router.post('/result/save', async (req, res) => {
                     category: catagory.substring(0, catagory.indexOf('>')),
                     field: catagory.substring(catagory.indexOf('>') + 1, catagory.indexOf('>', catagory.indexOf('>') + 1)), //slice필요
                     bookImage: book.cover
-                    //page는 상품 조회에 있네 도서 정보페이지에서 다시 저장해야할듯
                 })
                 return await newBook.save()
             } 

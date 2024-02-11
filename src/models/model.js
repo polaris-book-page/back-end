@@ -31,7 +31,8 @@ const userSchema  = mongoose.Schema({
 		token: String,
 		ttl: Number,
 		created: Number
-	}
+	},
+    goal: Number,
 });
 
 const likeSchema = new mongoose.Schema({

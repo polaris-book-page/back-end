@@ -120,8 +120,20 @@ router.put("/add-review", upload.single("planetImage"), async (req, res) => {
     }
 });
 
-router.get("/info", (req, res) => {
-    res.send("info");
+router.post("/info", async(req, res) => {
+    try {
+        const result = await Book.findOneAndUpdate(
+            { isbn: req.body.isbn },
+            { $set: { page: req.body.page } },
+            { upsert: true, new: true }
+        );
+        res.status(200).json({ 
+            update_book_info: true, 
+            book: result 
+        });
+    } catch (e) {
+        res.status(500).json({ error: "fail to find book info.", e });
+    } 
 });
 
 router.get("/info/rewiew", async (req, res) => {

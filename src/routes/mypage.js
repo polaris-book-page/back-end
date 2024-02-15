@@ -88,6 +88,7 @@ router.get('/star-review', async (req, res) => {
                 userId: result ? result.userId : null,
                 isbn: result ? result.isbn : null,
                 evaluation: result ? result.evaluation : null,
+                startDate: result ? result.startDate : null,
                 endDate: result ? result.endDate: null,
                 bookImage: book ? book.bookImage : null,
                 planetImage: result ? result.planetImage : null,

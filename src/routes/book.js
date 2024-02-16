@@ -136,7 +136,7 @@ router.post("/info", async(req, res) => {
     } 
 });
 
-router.get("/info/rewiew", async (req, res) => {
+router.get("/info/review", async (req, res) => {
     if(!req.session.is_logined){
         res.redirect('/user/login');
     }
@@ -147,7 +147,6 @@ router.get("/info/rewiew", async (req, res) => {
             sentence: quoteReview[0].sentence,
             page: quoteReview[0].page
         };
-        console.log(review)
         const result = {
                 isbn: review.isbn,
                 evaluation: review.evaluation,

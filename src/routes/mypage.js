@@ -223,11 +223,8 @@ router.post('/like', async (req, res) => {
 });
 
 router.delete('/unlike', async (req, res) => {
-    if(!req.session.is_logined){
-        res.redirect('/user/login');
-    }
     try {
-        const result = await Like.deleteOne({ userId: req.session.userId, isbn: req.body.isbn });
+        const result = await Like.deleteOne({ userId: req.body.userId, isbn: req.body.isbn });
         res.status(200).json({
             likeDel_success: true,
             result: result 

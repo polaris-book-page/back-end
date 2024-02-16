@@ -196,11 +196,21 @@ router.post('/like', async (req, res) => {
     if(!req.session.is_logined){
         res.redirect('/user/login');
     }
-    const likeInfo = new Like(req.body);
-    likeInfo.userId = req.session.userId
+    // console.log(req.body)
     try {
+        const isLiked = await Like.findOne({ userId: req.session.userId, isbn: req.body.isbn })
+        if (isLiked) {
+            res.status(200).json({
+                like_success: false,
+                message: 'already liked book'
+            });
+            return; 
+        }
+        const likeInfo = new Like({
+            isbn: req.body.isbn,
+            userId: req.session.userId
+        });
         const result = await likeInfo.save();
-        
         res.status(200).json({
             like_success: true,
             result: result 
@@ -226,6 +236,19 @@ router.delete('/unlike', async (req, res) => {
         res.status(500).json({ likeDel_success: false, err });
     }
 });
+
+router.post("/check/like", async (req, res) => {
+    try {
+        const isLiked = await Like.findOne({ userId: req.session.userId, isbn: req.body.isbn })
+        if (isLiked) {
+            return res.status(201).json({ is_liked: true });
+        } else {
+            return res.status(201).json({ is_liked: false });
+        }
+    } catch (e) {
+        return res.status(500).json({ error: 'An error occurred during check book liked.', err });
+    }
+})
 
 router.get('/like/list', async (req, res) => {
     try {

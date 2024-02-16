@@ -247,7 +247,7 @@ router.post("/check/like", async (req, res) => {
             return res.status(201).json({ is_liked: false });
         }
     } catch (e) {
-        return res.status(500).json({ error: 'An error occurred during check book liked.', err });
+        return res.status(500).json({ error: 'An error occurred during check book liked.', e });
     }
 })
 

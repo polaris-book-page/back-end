@@ -140,9 +140,11 @@ router.post('/login', async (req, res) => {
 
 router.get("/check", async (req, res) => {
     if(req.session.is_logined){
-        return res.status(201).json({ is_logined: req.session.is_logined, userId: req.session.userId});
+        const user = await User.findOne({ _id: req.session.userId });
+        // console.log(user)
+        return res.status(201).json({ is_logined: req.session.is_logined, userId: req.session.userId, nickname: user.nickname });
     } else {
-        return res.json({ is_logined: false, userId: "none" });
+        return res.json({ is_logined: false, userId: "none", nickname: "none" });
     }
 })
 

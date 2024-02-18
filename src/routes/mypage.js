@@ -31,11 +31,12 @@ router.put('/modify', upload.single("profileImage"), async (req, res) => {
         res.redirect('/user/login');
     }
     
-    const profileImage = req.file.location;
     const nickname = req.body.nickname;
     const updateField= {};
-    if (profileImage) {
-        updateField.profileImage = profileImage;
+    if (req.file !== undefined) {
+        const profileImage = req.file.location;
+
+        if (profileImage) updateField.profileImage = profileImage;
     }
     if (nickname) {
         updateField.nickname = nickname;

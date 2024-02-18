@@ -166,8 +166,7 @@ router.get("/info/review", async (req, res) => {
 
 router.post("/info/review/list", async (req, res) => {
     try {
-        const reviews = await Review.find({ isbn: req.body.isbn })
-        console.log("isbn: ", req.body.isbn)
+        const reviews = await Review.find({ isbn: req.body.isbn }).sort({"createDate": -1})
         if (reviews.length === 0) {
             res.status(404).json({ 
                 findBookReview: false, 

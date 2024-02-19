@@ -164,27 +164,34 @@ router.get("/info/review", async (req, res) => {
     }
 });
 
-router.post("/info/review/list", async (req, res) => {
+router.get("/info/review/list", async (req, res) => {
+    const isbn = req.query.isbn;
+    const currentPage = req.query.page || 1;
+    const perPage = 6;
+
     try {
-        const reviews = await Review.find({ isbn: req.body.isbn }).sort({"createDate": -1})
+        const reviews = await Review.find({ isbn: isbn })
+            .sort({ "createDate": -1 })
+            .skip((currentPage - 1) * perPage)
+            .limit(perPage);
         if (reviews.length === 0) {
-            res.status(404).json({ 
+            return res.status(200).json({ 
                 findBookReview: false, 
                 message: 'No review corresponding to this isbn' });
-            }
-            const userIds = reviews.map(review => review.userId)
-            const users = await User.find({ _id: userIds })
+        }
+        const userIds = reviews.map(review => review.userId)
+        const users = await User.find({ _id: userIds })
 
-            const userIdToReviewCountMap = await Review.aggregate([
-                { $match: { userId: { $in: userIds } } },
-                { $group: { _id: "$userId", count: { $sum: 1 } } }
-            ]);
-            const userIdToReviewCount = {};
-            userIdToReviewCountMap.forEach(item => {
-                userIdToReviewCount[item._id.toString()] = item.count;
-            });
+        const userIdToReviewCountMap = await Review.aggregate([
+            { $match: { userId: { $in: userIds } } },
+            { $group: { _id: "$userId", count: { $sum: 1 } } }
+        ]);
+        const userIdToReviewCount = {};
+        userIdToReviewCountMap.forEach(item => {
+            userIdToReviewCount[item._id.toString()] = item.count;
+        });
         
-            const result = reviews.map(review => {
+        const result = reviews.map(review => {
                 const user = users.find(user => user._id.toString() === review.userId.toString());
                 const login_user_reviews = userIdToReviewCount[review.userId.toString()] || 0;
             return {
@@ -198,7 +205,7 @@ router.post("/info/review/list", async (req, res) => {
                 finRead: login_user_reviews
             };
         })
-        res.status(200).json(result)
+        res.status(200).json({ result: result, findBookReview: true })
     } catch (err) {
         console.error('Error in read book review list', err);
         res.status(500).json({ findBookReview: false, err });

@@ -7,12 +7,13 @@ router.post('/result/save', async (req, res) => {
 
     try {
         const bookList = books.map(async book => {
-            const alreadyHave = await Book.findOne({ isbn: book.isbn13 })
+            const alreadyHave13 = await Book.findOne({ isbn: book.isbn13.toString() })
+            const alreadyHave = await Book.findOne({ isbn: book.isbn.toString() })
             const haveTranslator = book.author.indexOf('(옮긴이)')
-            if (!alreadyHave) {
+            if (!(alreadyHave || alreadyHave13)) {
                 const catagory = book.categoryName.substring(book.categoryName.indexOf('>') + 1)
                 const newBook = new Book({
-                    isbn: book.isbn13,
+                    isbn: book.isbn13 ? book.isbn13 : book.isbn,
                     title: book.title,
                     writer: book.author.substring(0, book.author.indexOf('(지은이)') - 1),
                     translator: haveTranslator != -1 

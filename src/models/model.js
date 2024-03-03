@@ -40,7 +40,7 @@ const likeSchema = new mongoose.Schema({
         type: String,
         ref: "User",
     },
-    isbn: Number,
+    isbn: String,
 });
 
 const reviewSchema = new mongoose.Schema({
@@ -49,7 +49,7 @@ const reviewSchema = new mongoose.Schema({
         ref: "User",
     },
     isbn: {
-        type: Number,
+        type: String,
         ref: "Book",
     },
     evaluation: Number,
@@ -70,7 +70,7 @@ const reviewSchema = new mongoose.Schema({
 });
 
 const bookSchema = new mongoose.Schema({
-    isbn: Number,
+    isbn: String,
     title: String,
     page: Number,
     writer: String,
@@ -87,7 +87,7 @@ const quoteSchema = new mongoose.Schema({
         ref: "Review",
     },
     isbn: {
-        type: Number,
+        type: String,
         ref: "Book",
     },
     quote: String,

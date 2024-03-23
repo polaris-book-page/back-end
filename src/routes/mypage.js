@@ -106,6 +106,59 @@ router.post('/star-review/detail', (req, res) => {
     res.send("star-review/detail");
 });
 
+router.post('/review/add', upload.single("planetImage"), async (req, res) => {
+
+    let quotes = new Array();
+
+    try{
+        const newReview = new Review({
+            userId: req.body.userId,
+            isbn: req.body.isbn,
+            evaluation: req.body.evaluation,
+            content: req.body.content,
+            startDate: req.body.startDate,
+            endDate: req.body.endDate,
+            plenetImage: req.file.location.plenetImage,
+            type: req.body.type,
+            progressPage: req.body.progressPage,
+            progressPercent: req.body.progressPercent,
+        });
+        
+        const resReview = await newReview.save();
+
+        // parsing
+        let parsing = JSON.parse(req.body.quotes)
+
+        // find book
+        const findBook = await Book.findOne( {isbn: req.body.isbn} )
+        console.log(parsing.length);
+
+        for (let add = 0; add < parsing.length; add++) {
+            const quoteInfo = new Quote({
+                reviewId: newReview._id,
+                isbn: newReview.isbn,
+                quote: parsing[add]['quote'],
+                page: parsing[add]['page'],
+                category: findBook.category,
+            });
+            const resQuote = await quoteInfo.save();
+            quotes.push(resQuote);
+        }
+
+        const result = {
+            review: resReview,
+            quote: quotes.length != 0 ? quotes : null
+        }
+        return res.status(200).json({
+            success: true,
+            result: result
+        })
+    }
+    catch(err){
+        res.status(500).json({success: false, err})
+    }
+})
+
 router.put('/review/modify', async (req, res) => {
     let quotes = new Array();
 

@@ -120,6 +120,7 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
             endDate: req.body.endDate,
             plenetImage: req.file.location.plenetImage,
             type: req.body.type,
+            category: req.body.category,
             progressPage: req.body.progressPage,
             progressPercent: req.body.progressPercent,
         });

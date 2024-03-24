@@ -350,4 +350,20 @@ router.post('/goal', async (req, res) => {
     }
 })
 
+router.get('/iswrited/review/:userId/:isbn', async (req, res) => {
+    const userId = req.params.userId;
+    const isbn = req.params.isbn;
+    
+    try{
+        const findReview = await Review.findOne({userId: userId, isbn: isbn});
+        
+        if(findReview === null) return res.status(200).json({ success: true, iswrited: false });
+        else return res.status(200).json({ success: true, iswrited: true });
+
+    } catch(err){
+        console.error('Server error', err);
+        res.status(500).json({ success: false, err });
+    }
+})
+
 module.exports = router

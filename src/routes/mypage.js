@@ -358,7 +358,7 @@ router.get('/iswrited/review/:userId/:isbn', async (req, res) => {
         const findReview = await Review.findOne({userId: userId, isbn: isbn});
         
         if(findReview === null) return res.status(200).json({ success: true, iswrited: false });
-        else return res.status(200).json({ success: true, iswrited: true });
+        else return res.status(200).json({ success: true, iswrited: true, reviewId: findReview._id });
 
     } catch(err){
         console.error('Server error', err);

@@ -5,9 +5,6 @@ const email = require('../../config/email');
 const upload = require("../aws-storage.js");
 
 router.get('/', async (req, res) => {
-    if(!req.session.is_logined){
-        res.redirect('/user/login');
-    }
     try {
         const result = await User.findOne({ _id: req.session.userId });
 
@@ -27,10 +24,6 @@ router.get('/', async (req, res) => {
 });
 
 router.put('/modify', upload.single("profileImage"), async (req, res) => {
-    if(!req.session.is_logined){
-        res.redirect('/user/login');
-    }
-    
     const nickname = req.body.nickname;
     const updateField= {};
     if (req.file !== undefined) {
@@ -43,7 +36,6 @@ router.put('/modify', upload.single("profileImage"), async (req, res) => {
     }
     console.log(updateField)
     try {
-
         const result = await User.updateOne(
             { _id: `${ req.session.userId }` },
             { $set: 
@@ -65,14 +57,7 @@ router.get('/universe', (req, res) => {
     res.send("universe");
 });
 
-router.get('/calendar', (req, res) => {
-    res.send("calendar");
-});
-
 router.get('/star-review', async (req, res) => {
-    if(!req.session.is_logined){
-        res.redirect('/user/login');
-    }
     try {
         const results = await Review.find({ userId: req.session.userId })
         if (results.length === 0) {
@@ -249,10 +234,6 @@ router.delete('/review/delete', async (req, res) => {
 });
 
 router.post('/like', async (req, res) => {
-    if(!req.session.is_logined){
-        res.redirect('/user/login');
-    }
-    // console.log(req.body)
     try {
         const isLiked = await Like.findOne({ userId: req.session.userId, isbn: req.body.isbn })
         if (isLiked) {

@@ -109,6 +109,7 @@ router.post('/star-review/detail', (req, res) => {
 router.post('/review/add', upload.single("planetImage"), async (req, res) => {
 
     let quotes = new Array();
+    
 
     try{
         const newReview = new Review({
@@ -118,7 +119,7 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
             content: req.body.content,
             startDate: req.body.startDate,
             endDate: req.body.endDate,
-            plenetImage: req.file.location.plenetImage,
+            planetImage: req.file.location.planetImage,
             type: req.body.type,
             category: req.body.category,
             progressPage: req.body.progressPage,
@@ -126,20 +127,19 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
         });
         
         const resReview = await newReview.save();
-
+        
         // parsing
-        let parsing = JSON.parse(req.body.quotes)
+        let parsing = req.body.quotes;
 
         // find book
         const findBook = await Book.findOne( {isbn: req.body.isbn} )
-        console.log(parsing.length);
 
-        for (let add = 0; add < parsing.length; add++) {
+        for (let add = 0; add < JSON.parse(parsing).length; add++) {
             const quoteInfo = new Quote({
                 reviewId: newReview._id,
                 isbn: newReview.isbn,
-                quote: parsing[add]['quote'],
-                page: parsing[add]['page'],
+                quote: JSON.parse(parsing)[add].quote,
+                page: JSON.parse(parsing)[add].page,
                 category: findBook.category,
             });
             const resQuote = await quoteInfo.save();
@@ -156,6 +156,7 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
         })
     }
     catch(err){
+        console.log(err)
         res.status(500).json({success: false, err})
     }
 })

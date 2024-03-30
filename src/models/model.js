@@ -63,6 +63,7 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     progressPage: Number,
     progressPercent: Number,
+    category: String,
     createDate: {
         type: Date,
         default: Date.now,

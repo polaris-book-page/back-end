@@ -71,6 +71,7 @@ router.get('/star-review', async (req, res) => {
         const reviewList = results.map(result => {
             const book = books.find(book => book.isbn.toString() === result.isbn.toString());
             return {
+                title: book ? book.title : null,
                 userId: result ? result.userId : null,
                 isbn: result ? result.isbn : null,
                 evaluation: result ? result.evaluation : null,

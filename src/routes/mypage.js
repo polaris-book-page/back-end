@@ -315,7 +315,7 @@ router.get('/like/list', async (req, res) => {
 router.post('/goal', async (req, res) => {
     try {
         const result = await User.findOneAndUpdate(
-            { userId: req.body._id },
+            { _id: req.session.userId },
             {
                 $set: {
                     goal: req.body.goal

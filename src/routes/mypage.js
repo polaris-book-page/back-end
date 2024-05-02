@@ -332,6 +332,25 @@ router.post('/goal', async (req, res) => {
     }
 })
 
+router.get('/goal/check', async (req, res) => {
+    try {
+        const findUser = await User.findOne({ _id: req.session.userId });
+        if (findUser.goal) {
+            res.status(200).json({
+                result: true,
+                goal: findUser.goal 
+            });
+        } else {
+            res.status(200).json({
+                result: false 
+            });
+        }
+    } catch(err) {
+        console.error('Error in check goal', err);
+        res.status(500).json({ goal_check: false, err });
+    }
+})
+
 router.get('/iswrited/review/:userId/:isbn', async (req, res) => {
     const userId = req.params.userId;
     const isbn = req.params.isbn;

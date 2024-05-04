@@ -120,10 +120,14 @@ router.put("/add-review", upload.single("planetImage"), async (req, res) => {
     }
 });
 
-router.post("/info", async(req, res) => {
+router.get("/info/:isbn", async(req, res) => {
+    console.log(req.params.isbn)
+    const isbn = req.params.isbn;
+    console.log(isbn)
+    
     try {
         const result = await Book.findOneAndUpdate(
-            { isbn: req.body.isbn },
+            { isbn: isbn },
             { $set: { page: req.body.page } },
             { upsert: true, new: true }
         );
@@ -136,25 +140,32 @@ router.post("/info", async(req, res) => {
     } 
 });
 
-router.get("/info/review", async (req, res) => {
+router.get("/info/review/:isbn", async (req, res) => {
+    console.log(req.params.isbn)
+    const isbn = req.params.isbn;
     if(!req.session.is_logined){
         res.redirect('/user/login');
     }
     try {
-        const review = await Review.findOne({ userId: req.session.userId, isbn: req.body.isbn })
-        const quoteReview = await Quote.find({ userId: req.session.userId, isbn: req.body.isbn })
-        const quoteInfo = Object.keys(quoteReview).length === 0 ? null : {
-            sentence: quoteReview[0].sentence,
-            page: quoteReview[0].page
-        };
+        const review = await Review.findOne({ userId: req.session.userId, isbn: isbn })
+        const book = await Book.findOne({ isbn: isbn });
+        const quoteReview = await Quote.find({ reviewId: review._id, isbn: isbn })
+        const quoteInfo = Object.keys(quoteReview).length === 0 ? null : quoteReview.map(result =>{
+            return{
+                sentence: result.quote,
+                page: result.page
+            }
+        })
+        console.log(quoteReview)
+
         const result = {
-                isbn: review.isbn,
-                evaluation: review.evaluation,
+                isbn: isbn,
+                evaluation: review.evaluation ? review.evaluation : null,
                 planetImage: review.planetImage ? review.planetImage : null,
                 startDate: review.startDate,
                 endDate: review.endDate,
                 content: review.content ? review.content : null,
-                bookImage: req.body.bookImage,
+                bookImage: book.bookImage,
                 quote: quoteInfo
         } 
         res.status(200).json(result)

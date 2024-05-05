@@ -71,8 +71,10 @@ router.get('/star-review', async (req, res) => {
         const reviewList = results.map(result => {
             const book = books.find(book => book.isbn.toString() === result.isbn.toString());
             return {
+                title: book ? book.title : null,
+                author: book? book.writer : null,
                 userId: result ? result.userId : null,
-                isbn: result ? result.isbn : null,
+                isbn: result ? result.isbn : null, 
                 evaluation: result ? result.evaluation : null,
                 startDate: result ? result.startDate : null,
                 endDate: result ? result.endDate: null,
@@ -118,7 +120,7 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
 
         // find book
         const findBook = await Book.findOne( {isbn: req.body.isbn} )
-
+        console.log(req.body.isbn);
         for (let add = 0; add < JSON.parse(parsing).length; add++) {
             const quoteInfo = new Quote({
                 reviewId: newReview._id,
@@ -146,32 +148,37 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
     }
 })
 
-router.put('/review/modify', async (req, res) => {
+router.put('/review/modify', upload.single("planetImage"), async (req, res) => {
     let quotes = new Array();
+    
+    // parsing
+    let parsing = req.body.quotes;
 
     try {
         // update review
         // add to planetImage property later.
         const reviewResult = await Review.findOneAndUpdate({ _id: req.body._id }, {
             $set: {
-            evaluation: req.body.evaluation,
-            content: req.body.content,
-            startDate: req.body.startDate,
-            endDate: req.body.endDate,
+                evaluation: req.body.evaluation,
+                content: req.body.content,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
+                planetImage: req.file.location,
+                type: req.body.type,
             }
         }, { returnDocument: "after" })
 
         // update quote
         const findQuote = await Quote.find({ reviewId: req.body._id })
 
-        if (findQuote.length <= req.body.quotes.length) { // update + create
+        if (findQuote.length <= JSON.parse(parsing).length) { // update + create
             // update
             for (find in findQuote) {
                 console.log(find)
                 const quoteResult = await Quote.findOneAndUpdate({ _id: findQuote[find]._id }, {
                     $set: {
-                        quote: req.body.quotes[find].quote,
-                        page: req.body.quotes[find].page,
+                        quote: JSON.parse(parsing)[find].quote,
+                        page: JSON.parse(parsing)[find].page,
                     }
                 }, { returnDocument: "after" })
                 quotes.push(quoteResult);
@@ -179,12 +186,12 @@ router.put('/review/modify', async (req, res) => {
 
             } 
             //create
-            for (let add = 0; add < req.body.quotes.length - findQuote.length; add++) {
+            for (let add = 0; add < JSON.parse(parsing).length - findQuote.length; add++) {
                 const quoteInfo = new Quote({
                     reviewId: reviewResult._id,
                     isbn: reviewResult.isbn,
-                    quote: req.body.quotes[findQuote.length + add]['quote'],
-                    page: req.body.quotes[findQuote.length + add]['page'],
+                    quote: JSON.parse(parsing)[findQuote.length + add]['quote'],
+                    page: JSON.parse(parsing)[findQuote.length + add]['page'],
                     category: req.body.category,
                 });
                 const result = await quoteInfo.save();
@@ -199,8 +206,8 @@ router.put('/review/modify', async (req, res) => {
                 const quoteInfo = new Quote({
                     reviewId: reviewResult._id,
                     isbn: reviewResult.isbn,
-                    quote: req.body.quotes[add]['quote'],
-                    page: req.body.quotes[add]['page'],
+                    quote: JSON.parse(parsing)[add]['quote'],
+                    page: JSON.parse(parsing)[add]['page'],
                     category: req.body.category,
                 });
                 const result = await quoteInfo.save();

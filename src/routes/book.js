@@ -44,81 +44,81 @@ router.post("/add-book", upload.single("bookImage"), async (req, res) => {
     }
 });
 
-router.put("/add-review", upload.single("planetImage"), async (req, res) => {
-    let reviewId;
-    let resBody;
-    let quotes = new Array();
+// router.put("/add-review", upload.single("planetImage"), async (req, res) => {
+//     let reviewId;
+//     let resBody;
+//     let quotes = new Array();
 
-    try {
-        const review = await Review.findOne({
-            userId: req.body.userId,
-            isbn: req.body.isbn,
-        });
-        if (review == null) {
-            // new review
-            const reviewInfo = new Review({
-                userId: req.body.userId,
-                isbn: req.body.isbn,
-                evaluation: req.body.evaluation,
-                content: req.body.content,
-                progressPage: req.body.progressPage,
-                progressPercent: req.body.progressPercent,
-                quotes: req.body.quotes,
-                category: req.body.category,
-                startDate: req.body.startDate,
-                endDate: req.body.endDate,
-                planetImage: req.file.location
-            });
-            const result = await reviewInfo.save();
-            reviewId = reviewInfo._id;
-            resBody = result;
-        } else {
-            // exist review content
-            const result = await Review.findOneAndUpdate(
-                { userId: req.body.userId, isbn: req.body.isbn },
-                {
-                    $set: {
-                        evaluation: req.body.evaluation,
-                        content: req.body.content,
-                        startDate: req.body.startDate,
-                        endDate: req.body.endDate,
-                        planetImage: req.file.location,
-                        type: req.body.type,
-                        progressPage: req.body.progressPage,
-                        progressPercent: req.body.progressPercent,
-                    },
-                }, {returnDocument: "after"}
-            );
-            reviewId = result._id;
-            resBody = result;
-        }
+//     try {
+//         const review = await Review.findOne({
+//             userId: req.body.userId,
+//             isbn: req.body.isbn,
+//         });
+//         if (review == null) {
+//             // new review
+//             const reviewInfo = new Review({
+//                 userId: req.body.userId,
+//                 isbn: req.body.isbn,
+//                 evaluation: req.body.evaluation,
+//                 content: req.body.content,
+//                 progressPage: req.body.progressPage,
+//                 progressPercent: req.body.progressPercent,
+//                 quotes: req.body.quotes,
+//                 category: req.body.category,
+//                 startDate: req.body.startDate,
+//                 endDate: req.body.endDate,
+//                 planetImage: req.file.location
+//             });
+//             const result = await reviewInfo.save();
+//             reviewId = reviewInfo._id;
+//             resBody = result;
+//         } else {
+//             // exist review content
+//             const result = await Review.findOneAndUpdate(
+//                 { userId: req.body.userId, isbn: req.body.isbn },
+//                 {
+//                     $set: {
+//                         evaluation: req.body.evaluation,
+//                         content: req.body.content,
+//                         startDate: req.body.startDate,
+//                         endDate: req.body.endDate,
+//                         planetImage: req.file.location,
+//                         type: req.body.type,
+//                         progressPage: req.body.progressPage,
+//                         progressPercent: req.body.progressPercent,
+//                     },
+//                 }, {returnDocument: "after"}
+//             );
+//             reviewId = result._id;
+//             resBody = result;
+//         }
 
-        // new Quotes
-        if (req.body.quotes != null) {
-            for (i in req.body.quotes) {
-                const quoteInfo = new Quote({
-                    reviewId: reviewId, 
-                    isbn: req.body.isbn,
-                    quote:req.body.quotes[i]['quote'],
-                    page:req.body.quotes[i]['page'],
-                    category: req.body.category,
-                });
-                const result = await quoteInfo.save();
-                quotes.push(result);
-            }
-        }
+//         // new Quotes
+//         if (req.body.quotes != null) {
+//             for (i in req.body.quotes) {
+//                 const quoteInfo = new Quote({
+//                     reviewId: reviewId, 
+//                     isbn: req.body.isbn,
+//                     quote:req.body.quotes[i]['quote'],
+//                     page:req.body.quotes[i]['page'],
+//                     category: req.body.category,
+//                 });
+//                 const result = await quoteInfo.save();
+//                 quotes.push(result);
+//             }
+//         }
         
-        // return
-        res.status(200).json({
-            success: true,
-            data: {result: resBody, quotes: quotes.length != 0 ? quotes : null}
-        });
+//         // return
+//         res.status(200).json({
+//             success: true,
+//             data: {result: resBody, quotes: quotes.length != 0 ? quotes : null}
+//         });
 
-    } catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "fail to add review.", err });
-    }
-});
+//     } catch (err) {
+//         console.log(err);
+//         res.status(500).json({ error: "fail to add review.", err });
+//     }
+// });
 
 router.get("/info/:isbn", async(req, res) => {
     console.log(req.params.isbn)

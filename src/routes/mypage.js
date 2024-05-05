@@ -160,6 +160,8 @@ router.put('/review/modify', async (req, res) => {
                 content: req.body.content,
                 startDate: req.body.startDate,
                 endDate: req.body.endDate,
+                planetImage: req.file.location,
+                type: req.body.type,
             }
         }, { returnDocument: "after" })
 

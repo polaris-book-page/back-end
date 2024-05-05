@@ -72,8 +72,9 @@ router.get('/star-review', async (req, res) => {
             const book = books.find(book => book.isbn.toString() === result.isbn.toString());
             return {
                 title: book ? book.title : null,
+                author: book? book.writer : null,
                 userId: result ? result.userId : null,
-                isbn: result ? result.isbn : null,
+                isbn: result ? result.isbn : null, 
                 evaluation: result ? result.evaluation : null,
                 startDate: result ? result.startDate : null,
                 endDate: result ? result.endDate: null,
@@ -155,10 +156,10 @@ router.put('/review/modify', async (req, res) => {
         // add to planetImage property later.
         const reviewResult = await Review.findOneAndUpdate({ _id: req.body._id }, {
             $set: {
-            evaluation: req.body.evaluation,
-            content: req.body.content,
-            startDate: req.body.startDate,
-            endDate: req.body.endDate,
+                evaluation: req.body.evaluation,
+                content: req.body.content,
+                startDate: req.body.startDate,
+                endDate: req.body.endDate,
             }
         }, { returnDocument: "after" })
 

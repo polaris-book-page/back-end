@@ -159,6 +159,7 @@ router.get("/info/review/:isbn", async (req, res) => {
         console.log(quoteReview)
 
         const result = {
+                reviewId: review._id ? review._id : null,
                 isbn: isbn,
                 evaluation: review.evaluation ? review.evaluation : null,
                 planetImage: review.planetImage ? review.planetImage : null,

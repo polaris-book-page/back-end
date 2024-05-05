@@ -152,7 +152,7 @@ router.get("/info/review/:isbn", async (req, res) => {
         const quoteReview = await Quote.find({ reviewId: review._id, isbn: isbn })
         const quoteInfo = Object.keys(quoteReview).length === 0 ? null : quoteReview.map(result =>{
             return{
-                sentence: result.quote,
+                quote: result.quote,
                 page: result.page
             }
         })
@@ -166,7 +166,7 @@ router.get("/info/review/:isbn", async (req, res) => {
                 endDate: review.endDate,
                 content: review.content ? review.content : null,
                 bookImage: book.bookImage,
-                quote: quoteInfo
+                quotes: quoteInfo
         } 
         res.status(200).json(result)
     } catch (err) {

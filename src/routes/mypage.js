@@ -118,22 +118,28 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
         const resReview = await newReview.save();
         
         // parsing
-        let parsing = req.body.quotes;
+        let parsing = ""
+        if (req.body.quotes != null) {
+            parsing = req.body.quotes;
 
-        // find book
-        const findBook = await Book.findOne( {isbn: req.body.isbn} )
-        console.log(req.body.isbn);
-        for (let add = 0; add < JSON.parse(parsing).length; add++) {
-            const quoteInfo = new Quote({
-                reviewId: newReview._id,
-                isbn: newReview.isbn,
-                quote: JSON.parse(parsing)[add].quote,
-                page: JSON.parse(parsing)[add].page,
-                category: findBook.category,
-            });
-            const resQuote = await quoteInfo.save();
-            quotes.push(resQuote);
+            // find book
+            //const findBook = await Book.findOne( {isbn: req.body.isbn} )
+            console.log(req.body.isbn);
+            for (let add = 0; add < JSON.parse(parsing).length; add++) {
+                const quoteInfo = new Quote({
+                    reviewId: newReview._id,
+                    isbn: newReview.isbn,
+                    quote: JSON.parse(parsing)[add].quote,
+                    page: JSON.parse(parsing)[add].page,
+                    category: req.body.category,
+                });
+                const resQuote = await quoteInfo.save();
+                quotes.push(resQuote);
+            }
         }
+
+
+        
 
         const result = {
             review: resReview,

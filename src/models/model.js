@@ -55,7 +55,6 @@ const reviewSchema = new mongoose.Schema({
     evaluation: Number,
     content: {
         type: String,
-        maxlength: 250 * 3,
     },
     startDate: Date,
     endDate: Date,

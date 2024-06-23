@@ -119,7 +119,7 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
         let parsing = req.body.quotes;
 
         // find book
-        const findBook = await Book.findOne( {isbn: req.body.isbn} )
+        //const findBook = await Book.findOne( {isbn: req.body.isbn} )
         console.log(req.body.isbn);
         for (let add = 0; add < JSON.parse(parsing).length; add++) {
             const quoteInfo = new Quote({
@@ -127,7 +127,7 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
                 isbn: newReview.isbn,
                 quote: JSON.parse(parsing)[add].quote,
                 page: JSON.parse(parsing)[add].page,
-                category: findBook.category,
+                category: req.body.category,
             });
             const resQuote = await quoteInfo.save();
             quotes.push(resQuote);

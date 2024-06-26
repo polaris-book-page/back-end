@@ -98,7 +98,6 @@ router.post('/star-review/detail', (req, res) => {
 router.post('/review/add', upload.single("planetImage"), async (req, res) => {
 
     let quotes = new Array();
-    
 
     try{
         const newReview = new Review({
@@ -108,7 +107,7 @@ router.post('/review/add', upload.single("planetImage"), async (req, res) => {
             content: req.body.content,
             startDate: req.body.startDate,
             endDate: req.body.endDate,
-            planetImage: req.file.location.planetImage,
+            planetImage: req.file.location,
             type: req.body.type,
             category: req.body.category,
             progressPage: req.body.progressPage,

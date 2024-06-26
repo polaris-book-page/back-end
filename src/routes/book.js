@@ -141,7 +141,6 @@ router.get("/info/:isbn", async(req, res) => {
 });
 
 router.get("/info/review/:isbn", async (req, res) => {
-    console.log(req.params.isbn)
     const isbn = req.params.isbn;
     if(!req.session.is_logined){
         res.redirect('/user/login');
@@ -176,10 +175,12 @@ router.get("/info/review/:isbn", async (req, res) => {
     }
 });
 
-router.get("/info/review/list", async (req, res) => {
+router.get("/info/users/review/list", async (req, res) => {
     const isbn = req.query.isbn;
     const currentPage = req.query.page || 1;
     const perPage = 6;
+
+    console.log(isbn, currentPage)
 
     try {
         const reviews = await Review.find({ isbn: isbn })

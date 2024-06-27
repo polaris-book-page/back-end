@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../aws-storage.js");
-const { Book, Review, User, Quote } = require("../models/model");
+const { Book, Review, User, Quote, Like } = require("../models/model");
 
 router.get("/most-read", async (req, res) => {
     try {
@@ -232,6 +232,18 @@ router.get("/ten-quotes", async (req, res) => {
         res.status(200).json({ success: true, quotes: quotes })
     } catch (err) {
         res.status(500).json({ findQuote: false, err });
+    }
+});
+
+router.post("/cnt-likes", async (req, res) => {
+    const isbn = req.body.isbn
+    try {
+        const books = await Like.find({ isbn: isbn })
+
+        return res.status(200).json({ count: Object.keys(books).length });
+    } catch (err) {
+        console.error('Error in count likes', err);
+        res.status(500).json({ countLikes: false, err });
     }
 });
 

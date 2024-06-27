@@ -121,19 +121,21 @@ router.post("/add-book", upload.single("bookImage"), async (req, res) => {
 // });
 
 router.get("/info/:isbn", async(req, res) => {
-    console.log(req.params.isbn)
     const isbn = req.params.isbn;
-    console.log(isbn)
     
     try {
-        const result = await Book.findOneAndUpdate(
+        const result = await Book.findOne(
             { isbn: isbn },
-            { $set: { page: req.body.page } },
-            { upsert: true, new: true }
         );
         res.status(200).json({ 
-            update_book_info: true, 
-            book: result 
+            isbn: result.isbn,
+            title: result.title,
+            author: result.writer,
+            translator: result.translator,
+            publisher: result.publisher,
+            category: result.category,
+            field: result.field,
+            cover: result.bookImage
         });
     } catch (e) {
         res.status(500).json({ error: "fail to find book info.", e });

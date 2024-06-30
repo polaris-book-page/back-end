@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const upload = require("../aws-storage.js");
-const { Book, Review, User, Quote } = require("../models/model");
+const { Book, Review, User, Quote, Like } = require("../models/model");
 
 router.get("/most-read", async (req, res) => {
     try {
@@ -121,19 +121,21 @@ router.post("/add-book", upload.single("bookImage"), async (req, res) => {
 // });
 
 router.get("/info/:isbn", async(req, res) => {
-    console.log(req.params.isbn)
     const isbn = req.params.isbn;
-    console.log(isbn)
     
     try {
-        const result = await Book.findOneAndUpdate(
+        const result = await Book.findOne(
             { isbn: isbn },
-            { $set: { page: req.body.page } },
-            { upsert: true, new: true }
         );
         res.status(200).json({ 
-            update_book_info: true, 
-            book: result 
+            isbn: result.isbn,
+            title: result.title,
+            author: result.writer,
+            translator: result.translator,
+            publisher: result.publisher,
+            category: result.category,
+            field: result.field,
+            cover: result.bookImage
         });
     } catch (e) {
         res.status(500).json({ error: "fail to find book info.", e });
@@ -231,6 +233,18 @@ router.get("/ten-quotes", async (req, res) => {
         res.status(200).json({ success: true, quotes: quotes })
     } catch (err) {
         res.status(500).json({ findQuote: false, err });
+    }
+});
+
+router.post("/cnt-likes", async (req, res) => {
+    const isbn = req.body.isbn
+    try {
+        const books = await Like.find({ isbn: isbn })
+
+        return res.status(200).json({ count: Object.keys(books).length });
+    } catch (err) {
+        console.error('Error in count likes', err);
+        res.status(500).json({ countLikes: false, err });
     }
 });
 

@@ -55,10 +55,8 @@ router.get('/join/id-check/:_id', async(req, res) => {
     }
 });
 
-router.get('/join/nickname-check', async(req, res) => {
-    // 얘는 지금 받는 파라미터가 없는데 왜 body로 받아지지?
-    console.log(req.body)
-    const { nickname } = req.body;
+router.get('/join/nickname-check/:nickname', async(req, res) => {
+    const { nickname } = req.params;
     try {
         const result = await User.findOne({ nickname });
     

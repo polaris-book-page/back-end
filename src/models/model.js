@@ -72,7 +72,6 @@ const reviewSchema = new mongoose.Schema({
 const bookSchema = new mongoose.Schema({
     isbn: String,
     title: String,
-    page: Number,
     writer: String,
     translator: String,
     publisher: String,

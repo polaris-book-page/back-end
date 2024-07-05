@@ -144,20 +144,17 @@ router.get("/info/:isbn", async(req, res) => {
 
 router.get("/info/review/:isbn", async (req, res) => {
     const isbn = req.params.isbn;
-    if(!req.session.is_logined){
-        res.redirect('/user/login');
-    }
     try {
         const review = await Review.findOne({ userId: req.session.userId, isbn: isbn })
         const book = await Book.findOne({ isbn: isbn });
-        const quoteReview = await Quote.find({ reviewId: review._id, isbn: isbn })
+        const quoteReview = await Quote.find({ reviewId: review._id.toString(), isbn: isbn })
         const quoteInfo = Object.keys(quoteReview).length === 0 ? null : quoteReview.map(result =>{
             return{
                 quote: result.quote,
                 page: result.page
             }
         })
-        console.log(quoteReview)
+        console.log("quoteReview", quoteReview)
 
         const result = {
                 reviewId: review._id ? review._id : null,

@@ -160,8 +160,6 @@ router.put('/review/modify', upload.single("planetImage"), async (req, res) => {
     let parsing = null;
     // parsing
     if (req.body.quotes != null) parsing = req.body.quotes;
-    console.log(parsing)
-
     try {
         // update review
         // add to planetImage property later.
@@ -179,7 +177,7 @@ router.put('/review/modify', upload.single("planetImage"), async (req, res) => {
         // update quote
         const findQuote = await Quote.find({ reviewId: req.body._id })
 
-        if (JSON.parse(parsing).length > 0 && findQuote.length <= JSON.parse(parsing).length) { // update + create
+        if (parsing && JSON.parse(parsing).length > 0 && findQuote.length <= JSON.parse(parsing).length) { // update + create
             // update
             for (find in findQuote) {
                 console.log(find)
@@ -192,7 +190,7 @@ router.put('/review/modify', upload.single("planetImage"), async (req, res) => {
                 quotes.push(quoteResult);
                 
 
-            } 
+            }
             //create
             for (let add = 0; add < JSON.parse(parsing).length - findQuote.length; add++) {
                 const quoteInfo = new Quote({
@@ -205,7 +203,7 @@ router.put('/review/modify', upload.single("planetImage"), async (req, res) => {
                 const result = await quoteInfo.save();
                 quotes.push(result);
             }
-        } else if(findQuote.length > JSON.parse(parsing).length) { // update + delete
+        } else if(parsing && JSON.parse(parsing).length > 0 && findQuote.length > JSON.parse(parsing).length) { // update + delete
             // delete
             const quoteResult = await Quote.deleteMany({ reviewId: reviewResult._id }, {returnDocument: "after"})
             quotes.push(quoteResult)

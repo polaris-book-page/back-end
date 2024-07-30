@@ -3,6 +3,7 @@ const router = express.Router()
 const { Review, Like, Book, Quote, User } = require('../models/model');
 const email = require('../../config/email');
 const upload = require("../aws-storage.js");
+const { ConnectionStates } = require('mongoose');
 
 router.get('/', async (req, res) => {
     try {
@@ -56,35 +57,40 @@ router.put('/modify', upload.single("profileImage"), async (req, res) => {
 router.get('/universe', (req, res) => {
     res.send("universe");
 });
-
 router.get('/star-review', async (req, res) => {
     try {
-        const results = await Review.find({ userId: req.session.userId })
-        if (results.length === 0) {
-            return res.status(200).json({ 
-                findMyReview: false, 
-                message: 'No review corresponding to this user' 
-            });
-        }
-        const isbn = results.map(result => result.isbn);
-        const books = await Book.find({ isbn: isbn });
-        const reviewList = results.map(result => {
-            const book = books.find(book => book.isbn.toString() === result.isbn.toString());
-            return {
-                title: book ? book.title : null,
-                author: book? book.writer : null,
-                userId: result ? result.userId : null,
-                isbn: result ? result.isbn : null, 
-                category: result ? result.category : null,
-                type: result ? result.type : null,
-                evaluation: result ? result.evaluation : null,
-                startDate: result ? result.startDate : null,
-                endDate: result ? result.endDate: null,
-                bookImage: book ? book.bookImage : null,
-                planetImage: result ? result.planetImage : null,
+        if (req.session.userId) {
+            const results = await Review.find({ userId: req.session.userId })
+            if (results.length === 0) {
+                return res.status(200).json({ 
+                    findMyReview: false, 
+                    message: 'No review corresponding to this user' 
+                });
             }
-        })
-        res.status(200).json({ reviewList: reviewList, findMyReview: true });
+            const isbn = results.map(result => result.isbn);
+            const books = await Book.find({ isbn: isbn });
+            const reviewList = results.map(result => {
+                const book = books.find(book => book.isbn.toString() === result.isbn.toString());
+                return {
+                    title: book ? book.title : null,
+                    author: book? book.writer : null,
+                    userId: result ? result.userId : null,
+                    isbn: result ? result.isbn : null, 
+                    category: result ? result.category : null,
+                    type: result ? result.type : null,
+                    evaluation: result ? result.evaluation : null,
+                    startDate: result ? result.startDate : null,
+                    endDate: result ? result.endDate: null,
+                    bookImage: book ? book.bookImage : null,
+                    planetImage: result ? result.planetImage : null,
+                }
+            })
+            res.status(200).json({ reviewList: reviewList, findMyReview: true });
+        } 
+        else {
+            console.log("send fffffffffffffailure 500")
+            res.status(500).json({ findMyReview: false });
+        }
     } catch (err) {
         console.error('Error in read my review list', err);
         res.status(500).json({ findMyReview: false, err });

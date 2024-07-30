@@ -77,6 +77,7 @@ router.get('/star-review', async (req, res) => {
                     userId: result ? result.userId : null,
                     isbn: result ? result.isbn : null, 
                     category: result ? result.category : null,
+                    field: book ? book.field : null,
                     type: result ? result.type : null,
                     evaluation: result ? result.evaluation : null,
                     startDate: result ? result.startDate : null,

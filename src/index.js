@@ -22,7 +22,7 @@ const MongoStore = require('connect-mongo');
 const cors = require('cors')
 
 const corsOptions = {
-    origin: 'http://localhost:3000',
+    origin: 'https://polaris-book.vercel.app/',
     credentials: true,
 };
 app.use(cors(corsOptions));
